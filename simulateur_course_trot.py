@@ -67,8 +67,7 @@ def get_str_entry_user(prompt):
 def get_list_horses(nb_horses):
     list_horses = []
     for i in range(1, int(nb_horses) + 1):
-        horse = {'num_horse': i, 'speed': 0, 'distance_traveled': 0, 'disqualified': False, 'turn_arrival': 0,
-                 'nb_winner': 0}
+        horse = {'num_horse': i, 'speed': 0, 'distance_traveled': 0, 'disqualified': False, 'turn_arrival': 0}
         list_horses.append(horse)
     return list_horses
 
@@ -85,12 +84,8 @@ def get_progress_by_speed_and_dice_roll(speed):
     # On effectue le lancer du dé pour ce cheval
     dice_roll_nb = random.randint(0, 5)
 
-    # En fonction de la vitesse actuelle du cheval (passée en paramètre) et du lancer de dés, on récupère la progression de la vitesse
+    # En fonction de la vitesse actuelle du cheval et du lancer de dés, on récupère la progression de la vitesse
     value_progress = array_change_speed_with_dice_roll[speed][dice_roll_nb]
-    # if (str(value_progress) == "DQ"):
-    #    print("Cheval disqualifié")
-    # else:
-    #    print(f"Pour cette vitesse {speed} et le dé obtenu {dice_roll_nb+1} nous allons effectuer la progression suivante : {value_progress:+}")
     return value_progress
 
 
@@ -105,8 +100,6 @@ def print_horse_values(list_horses):
     )
     affichage_titres += "-" * 65
     print(affichage_titres)
-    #print(f"{'Numéro':<10} | {'Vitesse':>10} | {'Distance parcourue':>18} | {'Cheval disqualifié':>18}")
-    #print("-" * 60)
     affichage = ""
     for horse in list_horses:
         horse_disqualified = "Disqualifié" if horse["disqualified"] else ""
@@ -118,15 +111,12 @@ def print_horse_values(list_horses):
         )
         affichage += "-" * 65
         affichage += "\n"
-
-        # print(f"{str(horse["num_horse"]):<10} | {str(horse["speed"]):<8} | {str(horse["distance_traveled"]):<18} | {horse_disqualified:<15}")
-        # print("-" * 60)
     print(affichage)
 
 
 def print_horse_values_horizontal(list_horses,is_print_arrival=False):
     """ Fonction qui permet d'afficher pour chaque cheval la vitesse et la distance parcourue, ainsi que si le cheval est disqualifié
-    VERSION HORIZONTAL pour un affichage plus compact  """
+    VERSION HORIZONTALE pour un affichage plus compact  """
     print_num = (f"{'Numéro ':<20} | ")
     print_speed = (f"{'Vitesse ':<20} | ")
     print_distance = (f"{'Distance parcourue ':<20} | ")
@@ -162,25 +152,25 @@ def get_nb_horses_no_longer_in_race(list_horses):
 
 
 def is_end_race(list_horses, nb_horses):
-    """Fonction qui retourne True ET la liste des gagnants si la course est finie, False sinon"""
-    # Si on a autant de chevaux en dehors de la course (disqualifiés ou arrivés) que de chevaux dans la course, alors on affiche les gagnants
-    # s'il y en a , et on arrête la course.
+    """Fonction qui retourne True si la course est finie, False sinon"""
     nb_horses_no_longer_in_race = get_nb_horses_no_longer_in_race(list_horses)
-    print(f"*******************Il y a {nb_horses_no_longer_in_race} qui ne sont plus dans la course, d'une manière ou d'une autre\n")
+    # print(f"*******************Il y a {nb_horses_no_longer_in_race} qui ne sont plus dans la course, d'une manière ou d'une autre\n")
     if nb_horses_no_longer_in_race == int(nb_horses):
         return True
     return False
 
-# TODO
-#def get_winners(list_horses, type_race):
-    """Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)"""
+ """Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)
+ #TODO Améliorer la récupération de la liste des gagnants
+def get_winners(list_horses, type_race):
+   
     #TODO Voir quelle technique utiliser pour départager les gagnants
-    # TODO Il faut récupérer les x premiers (turn
-#    list_winners = {}
-#    for horse in list_horses:
-#        if horse["turn_arrival"] > 0:
-#            list_winners[horse["num_horse"]] = horse['turn_arrival']
-#    return list_winners
+    #TODO Il faut récupérer les x premiers (turn
+    list_winners = {}
+        for horse in list_horses:
+            if horse["turn_arrival"] > 0:
+                list_winners[horse["num_horse"]] = horse['turn_arrival']
+    return list_winners
+"""
 
 def main_simulator():
     """ Fonction qui lance la simulation de la course de trot"""
@@ -208,13 +198,11 @@ def main_simulator():
         elif (entry_user == "D"):
             nb_turn += 1
             elapsed_time_seconds += 10
-            nb_winner = 0
 
             # Pour chaque cheval de la liste, on effectue un lancer de dé et on modifie la vitesse et la distance parcourue du cheval suivant le lancer de dé
             for horse in list_horses:
                 # Si le cheval n'est pas disqualifié et pas non plus déjà arrivé
                 if not horse["disqualified"] and horse["turn_arrival"] == 0:
-                    # print (f"Pour ce cheval : {horse["num_horse"]}")
                     # Récupération de la progression ou non suivant le lancer de dé et la vitesse
                     speed_progress = get_progress_by_speed_and_dice_roll(horse["speed"])
                     if (speed_progress == "DQ"):
@@ -228,9 +216,8 @@ def main_simulator():
                         # Si le cheval a franchi la ligne d'arrivée on va le mettre à jour dans la liste des chevaux.
                         if horse["distance_traveled"] > CONST_LENGHT:
                             horse["turn_arrival"] = nb_turn
-                            nb_winner += 1
-                            horse["nb_winner"] = nb_winner
-                            # TODO Il faudra peaufiner les gagnants qui arrivent au même tour... le nombre de gagnants
+                            # On ajoute le cheval dans la liste des gagnants tant qu'on a pas rempli le tableau du bon nombre de gagnants
+                            # TODO Pas génial la technique si ex aequo, il faudra améliorer ça !
                             if (len(tab_winners) < int(type_race)):
                                 tab_winners[horse["num_horse"]] = horse["turn_arrival"]
                             # print(f"Le cheval {horse["num_horse"]} est arrivé il a parcouru {horse["distance_traveled"]} mètres . Il est arrivé au tour {horse['turn_arrival']} ")
@@ -245,14 +232,13 @@ def main_simulator():
             if is_end_race(list_horses, nb_horses):
                 print("La course est terminée ! Il n'y a plus aucun cheval présent dans la course ! ")
 
-                # TODO On récupère les gagnants suivant le type de course choisi (type_race = 3,4 ou 5)
-                #list_winners = get_winners(list_horses, type_race)
+                # On récupère les gagnants suivant le type de course choisi (type_race = 3,4 ou 5)
+                # list_winners = get_winners(list_horses, type_race)
 
-                #On affiche les gagnants
+                # On affiche les gagnants
                 print("Liste des gagnants : ")
                 for key, value in tab_winners.items():
                     print(f" Cheval n° {key} qui est arrivé au tour n°{value}")
-                    #print(f"Gagnant : {winner["num_horse"]}  Arrivée au tour numéro : {winner['']}")
 
                 # On arrête la course.
                 race_continue = False
