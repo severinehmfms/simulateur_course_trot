@@ -11,8 +11,8 @@ Séverine Hori Maitrehut
 
 
 # Longueur de la course
-#CONST_LENGHT = 2400
-CONST_LENGHT = 1400
+CONST_LENGHT = 2400
+#CONST_LENGHT = 400
 
 # Tuple qui donne la distance parcourue en fonction de la vitesse
 # Indice 0 = vitesse 0, indice 6 = vitesse 6
@@ -163,13 +163,15 @@ def is_end_race(list_horses, nb_horses):
     return False
 
 # TODO
-"""def get_winner(list_horses, type_race):
-    Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)
-    list_winners = {}
-    for horse in list_horses:
-        if horse["turn_arrival"] > 0:
-            list_winners[horse["num_horse"]] = horse['turn_arrival']
-    return list_winners"""
+#def get_winners(list_horses, type_race):
+    """Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)"""
+    #TODO Voir quelle technique utiliser pour départager les gagnants
+    # TODO Il faut récupérer les x premiers (turn
+#    list_winners = {}
+#    for horse in list_horses:
+#        if horse["turn_arrival"] > 0:
+#            list_winners[horse["num_horse"]] = horse['turn_arrival']
+#    return list_winners
 
 def main_simulator():
     """ Fonction qui lance la simulation de la course de trot"""
@@ -183,7 +185,7 @@ def main_simulator():
     # On initialise les chevaux de la course
     list_horses = []
     for i in range(1, int(nb_horses)+1):
-        horse = {'num_horse': i, 'speed': 0, 'distance_traveled': 0, 'disqualified': False, 'turn_arrival':0}
+        horse = {'num_horse': i, 'speed': 0, 'distance_traveled': 0, 'disqualified': False, 'turn_arrival':0, 'nb_winner':0}
         list_horses.append(horse)
 
     nb_turn = 0
@@ -200,6 +202,7 @@ def main_simulator():
         elif (entry_user == "D"):
             nb_turn += 1
             elapsed_time_seconds += 10
+            nb_winner = 0
 
             # Pour chaque cheval de la liste, on effectue un lancer de dé et on modifie la vitesse et la distance parcourue du cheval suivant le lancer de dé
             for horse in list_horses:
@@ -219,8 +222,10 @@ def main_simulator():
                         # Si le cheval a franchi la ligne d'arrivée on va le mettre à jour dans la liste des chevaux.
                         if horse["distance_traveled"] > CONST_LENGHT:
                             horse["turn_arrival"] = nb_turn
-                            # TODO Il faudra gérer le nombre de gagnants
-                            if (len(tab_winners) <= type_race):
+                            nb_winner += 1
+                            horse["nb_winner"] = nb_winner
+                            # TODO Il faudra peaufiner les gagnants qui arrivent au même tour... le nombre de gagnants
+                            if (len(tab_winners) < int(type_race)):
                                 tab_winners[horse["num_horse"]] = horse["turn_arrival"]
                             # print(f"Le cheval {horse["num_horse"]} est arrivé il a parcouru {horse["distance_traveled"]} mètres . Il est arrivé au tour {horse['turn_arrival']} ")
 
@@ -235,7 +240,7 @@ def main_simulator():
                 print("La course est terminée ! Il n'y a plus aucun cheval présent dans la course ! ")
 
                 # TODO On récupère les gagnants suivant le type de course choisi (type_race = 3,4 ou 5)
-                # list_winners = get_winner(list_horses, type_race)
+                #list_winners = get_winners(list_horses, type_race)
 
                 #On affiche les gagnants
                 print("Liste des gagnants : ")
