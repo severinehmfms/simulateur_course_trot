@@ -159,8 +159,8 @@ def is_end_race(list_horses, nb_horses):
         return True
     return False
 
- """Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)
- #TODO Améliorer la récupération de la liste des gagnants
+"""Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)
+#TODO Améliorer la récupération de la liste des gagnants
 def get_winners(list_horses, type_race):
    
     #TODO Voir quelle technique utiliser pour départager les gagnants
