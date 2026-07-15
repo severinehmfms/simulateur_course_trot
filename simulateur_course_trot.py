@@ -11,8 +11,11 @@ Séverine Hori Maitrehut
 
 
 # Longueur de la course
-#CONST_LENGHT = 2400
-CONST_LENGHT = 400
+#CONST_LENGTH = 2400
+CONST_LENGTH = 300
+CONST_SIZE_PROGRESS_BAR = 30
+CONST_CHAR_FULL_PROGRESS_BAR = "#"
+CONST_CHAR_EMPTY_PROGRESS_BAR = "-"
 
 # Tuple qui donne la distance parcourue en fonction de la vitesse
 # Indice 0 = vitesse 0, indice 6 = vitesse 6
@@ -89,7 +92,6 @@ def get_progress_by_speed_and_dice_roll(speed):
     return value_progress
 
 
-
 def print_horse_values(list_horses):
     """ Fonction qui permet d'afficher pour chaque cheval la vitesse et la distance parcourue, ainsi que si le cheval est disqualifié """
     affichage_titres = (
@@ -114,7 +116,7 @@ def print_horse_values(list_horses):
     print(affichage)
 
 
-def print_horse_values_horizontal(list_horses,is_print_arrival=False):
+def print_horse_values_horizontal(list_horses):
     """ Fonction qui permet d'afficher pour chaque cheval la vitesse et la distance parcourue, ainsi que si le cheval est disqualifié
     VERSION HORIZONTALE pour un affichage plus compact  """
     print_num = (f"{'Numéro ':<20} | ")
@@ -136,8 +138,21 @@ def print_horse_values_horizontal(list_horses,is_print_arrival=False):
     print(print_speed+"\n")
     print(print_distance+"\n")
     print(print_disqualified+"\n")
-    if (is_print_arrival):
-        print(print_arrived + "\n")
+    print(print_arrived + "\n")
+
+
+def get_visual_progression(list_horses):
+    """ Fonction permettant d'afficher une progression visuelle de chaque cheval dans la course """
+    size_barre = CONST_SIZE_PROGRESS_BAR
+    char_full = CONST_CHAR_FULL_PROGRESS_BAR
+    char_empty = CONST_CHAR_EMPTY_PROGRESS_BAR
+    for horse in list_horses:
+        # On calcule le nombre d'éléments pleins à afficher par rapport à la taille de la barre d'affichage
+        # On arrondit - et on borne la valeur à la taille de la barre pour ne pas dépasser
+        nb_full = min(round(size_barre * horse["distance_traveled"] / CONST_LENGTH), size_barre)
+        nb_empty = size_barre - nb_full
+        # On affiche la barre de progression
+        print(f"{horse["num_horse"]:5} : [{int(nb_full) * char_full}{int(nb_empty) * char_empty}]")
 
 
 def get_nb_horses_no_longer_in_race(list_horses):
@@ -158,6 +173,7 @@ def is_end_race(list_horses, nb_horses):
     if nb_horses_no_longer_in_race == int(nb_horses):
         return True
     return False
+
 
 """Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)
 #TODO Améliorer la récupération de la liste des gagnants
@@ -214,7 +230,7 @@ def main_simulator():
                         horse["distance_traveled"] = horse["distance_traveled"] + get_distance_by_speed(horse["speed"])
 
                         # Si le cheval a franchi la ligne d'arrivée on va le mettre à jour dans la liste des chevaux.
-                        if horse["distance_traveled"] > CONST_LENGHT:
+                        if horse["distance_traveled"] > CONST_LENGTH:
                             horse["turn_arrival"] = nb_turn
                             # On ajoute le cheval dans la liste des gagnants tant qu'on a pas rempli le tableau du bon nombre de gagnants
                             # TODO Pas génial la technique si ex aequo, il faudra améliorer ça !
@@ -224,7 +240,10 @@ def main_simulator():
 
             # Pour chaque cheval on affiche le récapitulatif : vitesse et distance parcourue.
             # print_horse_values(list_horses)
-            print_horse_values_horizontal(list_horses, True)
+            print_horse_values_horizontal(list_horses)
+
+            # On affiche la progression visuelle pour les chevaux
+            get_visual_progression(list_horses)
 
             # On affiche le temps écoulé
             print(f"Temps écoulé : {elapsed_time_seconds} secondes")
