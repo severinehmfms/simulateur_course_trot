@@ -11,8 +11,8 @@ Séverine Hori Maitrehut
 
 
 # Longueur de la course
-CONST_LENGHT = 2400
-#CONST_LENGHT = 400
+#CONST_LENGHT = 2400
+CONST_LENGHT = 400
 
 # Tuple qui donne la distance parcourue en fonction de la vitesse
 # Indice 0 = vitesse 0, indice 6 = vitesse 6
@@ -62,6 +62,15 @@ def get_str_entry_user(prompt):
     while not is_entry_user_ok(input_str):
         input_str = input("Saisie incorrecte. Merci de recommencer : ")
     return input_str
+
+
+def get_list_horses(nb_horses):
+    list_horses = []
+    for i in range(1, int(nb_horses) + 1):
+        horse = {'num_horse': i, 'speed': 0, 'distance_traveled': 0, 'disqualified': False, 'turn_arrival': 0,
+                 'nb_winner': 0}
+        list_horses.append(horse)
+    return list_horses
 
 
 def get_distance_by_speed(speed):
@@ -183,10 +192,7 @@ def main_simulator():
     type_race = get_int_input("Combien de chevaux seront classés à l'arrivée (3 pour Tiercé, 4 pour Quarté, 5 pour Quinté) : ", 3, 5)
 
     # On initialise les chevaux de la course
-    list_horses = []
-    for i in range(1, int(nb_horses)+1):
-        horse = {'num_horse': i, 'speed': 0, 'distance_traveled': 0, 'disqualified': False, 'turn_arrival':0, 'nb_winner':0}
-        list_horses.append(horse)
+    list_horses = get_list_horses(nb_horses)
 
     nb_turn = 0
     elapsed_time_seconds = 0
