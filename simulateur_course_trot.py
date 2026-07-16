@@ -11,8 +11,8 @@ Séverine Hori Maitrehut
 
 
 # Longueur de la course
-#CONST_LENGTH = 2400
-CONST_LENGTH = 300
+CONST_LENGTH = 2400
+# Paramètres pour la barre de progression
 CONST_SIZE_PROGRESS_BAR = 30
 CONST_CHAR_FULL_PROGRESS_BAR = "#"
 CONST_CHAR_EMPTY_PROGRESS_BAR = "-"
@@ -65,6 +65,13 @@ def get_str_entry_user(prompt):
     while not is_entry_user_ok(input_str):
         input_str = input("Saisie incorrecte. Merci de recommencer : ")
     return input_str
+
+
+def get_horse(list_horses, num_horse):
+    for horse in list_horses:
+        if horse["num_horse"] == num_horse:
+            return horse
+    return None
 
 
 def get_list_horses(nb_horses):
@@ -175,18 +182,34 @@ def is_end_race(list_horses, nb_horses):
     return False
 
 
-"""Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)
-#TODO Améliorer la récupération de la liste des gagnants
-def get_winners(list_horses, type_race):
-   
-    #TODO Voir quelle technique utiliser pour départager les gagnants
-    #TODO Il faut récupérer les x premiers (turn
-    list_winners = {}
-        for horse in list_horses:
-            if horse["turn_arrival"] > 0:
-                list_winners[horse["num_horse"]] = horse['turn_arrival']
+def get_winners(list_horses, type_race, tab_winners):
+    """Fonction qui renvoie la liste des gagnants suivant le type de course choisi (3, 4 ou 5)"""
+    list_winners = []
+
+    for num_tour in sorted(tab_winners):
+        #On va récupérer les x chevaux gagnants du 1er tour enregistré
+        winners_horses = tab_winners[num_tour].split("-")
+
+        # On récupère les dictionnaires des chevaux qui ont gagné pour ce tour
+        horses = []
+        for num_horse in winners_horses:
+            horse = get_horse(list_horses, int(num_horse))
+            horses.append(horse)
+
+        # Tri pour ce tour : distance décroissante puis vitesse décroissante (aide chat gpt pour ce tri)
+        horses.sort(
+            key=lambda h: (h["distance_traveled"], h["speed"]),
+            reverse=True
+        )
+
+        # On ajoute les gagnants tant qu'il reste des places
+        for horse in horses:
+            if len(list_winners) >= int(type_race):
+                break
+            list_winners.append(horse)
+
     return list_winners
-"""
+
 
 def main_simulator():
     """ Fonction qui lance la simulation de la course de trot"""
@@ -233,10 +256,10 @@ def main_simulator():
                         if horse["distance_traveled"] > CONST_LENGTH:
                             horse["turn_arrival"] = nb_turn
                             # On ajoute le cheval dans la liste des gagnants tant qu'on a pas rempli le tableau du bon nombre de gagnants
-                            # TODO Pas génial la technique si ex aequo, il faudra améliorer ça !
-                            if (len(tab_winners) < int(type_race)):
-                                tab_winners[horse["num_horse"]] = horse["turn_arrival"]
-                            # print(f"Le cheval {horse["num_horse"]} est arrivé il a parcouru {horse["distance_traveled"]} mètres . Il est arrivé au tour {horse['turn_arrival']} ")
+                            if nb_turn in tab_winners:
+                                tab_winners[nb_turn] += "-" + str(horse["num_horse"])
+                            else:
+                                tab_winners[nb_turn] = str(horse["num_horse"])
 
             # Pour chaque cheval on affiche le récapitulatif : vitesse et distance parcourue.
             # print_horse_values(list_horses)
@@ -252,12 +275,12 @@ def main_simulator():
                 print("La course est terminée ! Il n'y a plus aucun cheval présent dans la course ! ")
 
                 # On récupère les gagnants suivant le type de course choisi (type_race = 3,4 ou 5)
-                # list_winners = get_winners(list_horses, type_race)
+                list_winners = get_winners(list_horses, type_race, tab_winners)
 
                 # On affiche les gagnants
                 print("Liste des gagnants : ")
-                for key, value in tab_winners.items():
-                    print(f" Cheval n° {key} qui est arrivé au tour n°{value}")
+                for horse_win in list_winners:
+                    print(f"Cheval n°{horse_win['num_horse']} arrivé au tour {horse_win['turn_arrival']} - (Vitesse : {horse_win['speed']} Distance parcourue : {horse_win['distance_traveled']})")
 
                 # On arrête la course.
                 race_continue = False
