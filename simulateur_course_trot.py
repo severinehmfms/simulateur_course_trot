@@ -84,11 +84,6 @@ def get_list_horses(nb_horses):
     return list_horses
 
 
-def get_distance_by_speed(speed):
-    """Fonction qui renvoie la distance parcourue en un tour, par rapport à la vitesse du cheval"""
-    return tuple_distance[speed]
-
-
 def get_progress_by_speed_and_dice_roll(speed):
     """Fonction qui renvoie la progression d'un cheval en fonction de sa vitesse et du lancer de dé
         Vitesse entre 0 et 6
@@ -249,7 +244,8 @@ def main_simulator():
                 else:
                     # On va ensuite mettre à jour la vitesse du cheval et la distance qu'il parcourt pour ce tour.
                     horse["speed"] = horse["speed"] + speed_progress
-                    horse["distance_traveled"] = horse["distance_traveled"] + get_distance_by_speed(horse["speed"])
+                    horse["distance_traveled"] = horse["distance_traveled"] + tuple_distance[horse["speed"]]
+
 
                     # Si le cheval a franchi la ligne d'arrivée on va le mettre à jour dans la liste des chevaux.
                     if horse["distance_traveled"] > CONST_LENGTH:
